@@ -1,0 +1,35 @@
+- name:  Download Kibana
+  get_url: url=https://download.elasticsearch.org/kibana/kibana/{{kibana}}{{kibana_compressed}}  dest=/home/ubuntu
+
+- name: Extract kibana
+  unarchive: src=/home/ubuntu/{{kibana}}{{kibana_compressed}} dest=/home/ubuntu/ owner=elasticsearch copy=no
+
+- name: config kibana
+  replace: dest="/home/ubuntu/{{kibana}}/config/kibana.yml" regexp="(^host:\s)(.*)" replace='\1"localhost"' backup=yes
+
+- name: Create kibana directory
+  file: path=/opt/kibana state=directory
+
+- name: copy kibana to opt directory
+  shell: cp -R /home/ubuntu/{{kibana}}/* /opt/kibana/
+
+- name: create kibana service
+  get_url: url=https://gist.githubusercontent.com/thisismitch/8b15ac909aed214ad04a/raw/bce61d85643c2dcdfbc2728c55a41dab444dca20/kibana4 dest=/etc/init.d/
+
+- name: set execution permission on kibana
+  command: chmod +x /etc/init.d/kibana4
+
+- name: Start kibana on boot up
+  command: update-rc.d kibana4 defaults 95 9
+
+- name: start kibana
+  service: name=kibana4 state=started
+
+- name: Install python pip
+  apt: name=python-pip
+
+- name: Install python htpasswd
+  pip: name=passlib
+
+- name: create kibana admin user
+  htpasswd: path=/etc/nginx/htpasswd.users state=present name={{kibana_username}} password={{kibana_password}}
