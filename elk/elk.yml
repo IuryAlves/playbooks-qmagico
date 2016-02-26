@@ -1,9 +1,0 @@
-- name: Install ELK (ElasticSearch - Logstash - Kibana)
-  hosts: webservers
-  sudo: True
-  tasks:
-    - include: plays/kibana.yml kibana=kibana-4.0.1-linux-x64 kibana_compressed=.tar.gz kibana_username=qlogs kibana_password=qlogs
-    - include: plays/java8.yml
-    - include: plays/elasticsearch.yml
-    - include: plays/nginx.yml
-    - include: plays/logstash.yml  logstash_server_fqdn=qlogs.qmagico.com.br
